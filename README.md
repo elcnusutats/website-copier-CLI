@@ -1,6 +1,6 @@
 # website cloner/copier CLI
 
-hey, i made this because i was bored but most importantly, i made this so copying websites is way easier instead of downloading every image and copying code.
+hey, we made this because i was bored but most importantly, i made this so copying websites is way easier instead of downloading every image and copying code.
 
 ## what it actually does
 
@@ -18,3 +18,9 @@ hey, i made this because i was bored but most importantly, i made this so copyin
     
 * this only rips the front-end html, css, and images/gifs.
 * built with c# and htmlagilitypack.
+
+
+## credits
+
+* 46q: scripting
+* elcnusutats: scripting
