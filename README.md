@@ -1,4 +1,4 @@
-# website cloner/copier
+# website cloner/copier CLI
 
 hey, i made this because i was bored but most importantly, i made this so copying websites is way easier instead of downloading every image and copying code.
 
