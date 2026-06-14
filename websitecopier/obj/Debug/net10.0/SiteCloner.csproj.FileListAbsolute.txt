@@ -1,0 +1,17 @@
+C:\Users\idk\Desktop\SiteCloner\obj\Debug\net10.0\SiteCloner.csproj.AssemblyReference.cache
+C:\Users\idk\Desktop\SiteCloner\obj\Debug\net10.0\SiteCloner.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\idk\Desktop\SiteCloner\obj\Debug\net10.0\SiteCloner.AssemblyInfoInputs.cache
+C:\Users\idk\Desktop\SiteCloner\obj\Debug\net10.0\SiteCloner.AssemblyInfo.cs
+C:\Users\idk\Desktop\SiteCloner\obj\Debug\net10.0\SiteCloner.csproj.CoreCompileInputs.cache
+C:\Users\idk\Desktop\SiteCloner\bin\Debug\net10.0\SiteCloner.exe
+C:\Users\idk\Desktop\SiteCloner\bin\Debug\net10.0\SiteCloner.deps.json
+C:\Users\idk\Desktop\SiteCloner\bin\Debug\net10.0\SiteCloner.runtimeconfig.json
+C:\Users\idk\Desktop\SiteCloner\bin\Debug\net10.0\SiteCloner.dll
+C:\Users\idk\Desktop\SiteCloner\bin\Debug\net10.0\SiteCloner.pdb
+C:\Users\idk\Desktop\SiteCloner\bin\Debug\net10.0\HtmlAgilityPack.dll
+C:\Users\idk\Desktop\SiteCloner\obj\Debug\net10.0\SiteCloner.csproj.Up2Date
+C:\Users\idk\Desktop\SiteCloner\obj\Debug\net10.0\SiteCloner.dll
+C:\Users\idk\Desktop\SiteCloner\obj\Debug\net10.0\refint\SiteCloner.dll
+C:\Users\idk\Desktop\SiteCloner\obj\Debug\net10.0\SiteCloner.pdb
+C:\Users\idk\Desktop\SiteCloner\obj\Debug\net10.0\SiteCloner.genruntimeconfig.cache
+C:\Users\idk\Desktop\SiteCloner\obj\Debug\net10.0\ref\SiteCloner.dll

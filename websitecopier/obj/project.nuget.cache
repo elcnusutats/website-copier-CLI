@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "jMgFuVtWayY=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\idk\\Desktop\\SiteCloner\\SiteCloner.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\idk\\.nuget\\packages\\htmlagilitypack\\1.12.4\\htmlagilitypack.1.12.4.nupkg.sha512"
+  ],
+  "logs": []
+}
