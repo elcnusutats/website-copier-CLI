@@ -2,7 +2,7 @@
 
 hey, we made this because i was bored but most importantly, i made this so copying websites is way easier instead of downloading every image and copying code.
 
-## what it actually does
+## what it does
 
 * **multithreaded engine:** this will save time, it loads around 5 or 6 pages instead of one, how it works, it basically does the task on diffrent CPU cores.
 * **file names, verification of files:** fixes random file names, random question marks, so windows doesnt crashout.
@@ -18,9 +18,3 @@ hey, we made this because i was bored but most importantly, i made this so copyi
     
 * this only rips the front-end html, css, and images/gifs.
 * built with c# and htmlagilitypack.
-
-
-## credits
-
-* 46q: scripting
-* elcnusutats: scripting
