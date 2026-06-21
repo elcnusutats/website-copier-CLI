@@ -10,7 +10,7 @@ hey, we made this because i was bored but most importantly, i made this so copyi
 ## how to run this thing
 
 1. make sure you have the .net sdk installed on your computer, (https://dotnet.microsoft.com/en-us/download)
-2. clone or download this repository.
+2. go to the latest release and download it.
 3. double-click `launcher.bat` 
 4. pick option 1, paste your target url (like https://elcnusutats.netlify.app/), and hit enter.
 
