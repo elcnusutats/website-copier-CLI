@@ -1,15 +1,14 @@
 @echo off
 color 0A
-title WEBSITE COPIER
+title website copier
 
-:: Create temp directory and extract embedded C# files
 set "TEMP_DIR=%TEMP%\SiteCloner"
 powershell -NoProfile -Command "$self = [System.IO.File]::ReadAllText('%~f0'); $projStart = $self.IndexOf(':::' + 'CSPROJ_START' + ':::') + 18; $projLength = $self.IndexOf(':::' + 'CSPROJ_END' + ':::') - $projStart; $codeStart = $self.IndexOf(':::' + 'CS_START' + ':::') + 14; $codeLength = $self.IndexOf(':::' + 'CS_END' + ':::') - $codeStart; if ($projLength -gt 0 -and $codeLength -gt 0) { [System.IO.Directory]::CreateDirectory('%TEMP_DIR%') | Out-Null; [System.IO.File]::WriteAllText('%TEMP_DIR%\SiteCloner.csproj', $self.Substring($projStart, $projLength).Trim()); [System.IO.File]::WriteAllText('%TEMP_DIR%\Program.cs', $self.Substring($codeStart, $codeLength).Trim()); }"
 
 :MAINMENU
 cls
 echo =======================================================================================================
-echo                                        WEBSITE COPIER
+echo                                         website copier
 echo =======================================================================================================
 echo choose an option below:
 echo [1] copy/clone a website (recursively)
@@ -28,7 +27,7 @@ goto MAINMENU
 :CLONE
 echo.
 echo =======================================================================================================
-set /p targetUrl="enter the FULL target URL (e.g., https://example.com): "
+set /p targetUrl="enter the full target url (e.g., https://example.com): "
 echo.
 echo starting script...
 echo =======================================================================================================
@@ -41,7 +40,7 @@ goto MAINMENU
 :CLONESINGLE
 echo.
 echo =======================================================================================================
-set /p targetUrl="enter the FULL target URL for SINGLE page copy: "
+set /p targetUrl="enter the full target url for single page copy: "
 echo.
 echo starting script...
 echo =======================================================================================================
@@ -55,14 +54,13 @@ goto MAINMENU
 echo.
 echo =======================================================================================================
 set /p folderName="put the exact name of the folder you want to delete: "
-echo Deleting folder %folderName%...
+echo deleting folder %folderName%...
 rmdir /S /Q "%folderName%"
 echo folder deleted successfully.
 echo =======================================================================================================
 pause >nul
 goto MAINMENU
 
-:: Exit script before C# definitions
 exit /b
 
 :::CSPROJ_START:::
@@ -92,7 +90,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 
-// Task tracking and synchronization
 object ConsoleLock = new object();
 bool AnsiEnabled = false;
 long LastUpdateTicks = 0;
@@ -119,11 +116,10 @@ Regex CssImportRegex = new Regex(@"@import\s+['""]?([^'""\)]+)['""]?\s*;", Regex
 
 ConcurrentDictionary<string, byte> QueuedUrls = new ConcurrentDictionary<string, byte>(StringComparer.OrdinalIgnoreCase);
 
-// Start
 if (args.Length == 0)
 {
-    Console.WriteLine("ERROR: i dont see a url blud.");
-    Console.WriteLine("USAGE: dotnet run <website-URL> [concurrency] [--single-page]");
+    Console.WriteLine("error: i dont see a url blud.");
+    Console.WriteLine("usage: dotnet run <website-url> [concurrency] [--single-page]");
     return;
 }
 
@@ -149,8 +145,8 @@ for (int i = 0; i < args.Length; i++)
 
 if (string.IsNullOrEmpty(startUrl))
 {
-    Console.WriteLine("ERROR: i dont see a url blud.");
-    Console.WriteLine("USAGE: dotnet run <website-URL> [concurrency] [--single-page]");
+    Console.WriteLine("error: i dont see a url blud.");
+    Console.WriteLine("usage: dotnet run <website-url> [concurrency] [--single-page]");
     return;
 }
 
@@ -160,17 +156,15 @@ try
 }
 catch (Exception ex)
 {
-    Console.WriteLine($"ERROR: Invalid starting URL: {ex.Message}");
+    Console.WriteLine($"error: invalid starting url: {ex.Message.ToLower()}");
     return;
 }
 
 FolderName = BaseUri.Host;
 Directory.CreateDirectory(FolderName);
 
-// Initialize Registry
 Registry = new UrlRegistry(BaseUri);
 
-// Initialize HTTP Client with optimized connection handling and standard User-Agent
 var handler = new SocketsHttpHandler
 {
     AllowAutoRedirect = true,
@@ -182,52 +176,46 @@ Client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; W
 
 ConcurrencySemaphore = new SemaphoreSlim(maxConcurrency);
 
-// Enable ANSI and setup screen
 EnableAnsi();
 if (AnsiEnabled)
 {
     Console.Clear();
-    Console.Write("\x1b[5;r"); // set scroll margin: lines 5 to bottom
-    Console.SetCursorPosition(0, 4); // move to log area start
+    Console.Write("\x1b[5;r");
+    Console.SetCursorPosition(0, 4);
 }
 
-Log($"[+] Created root folder: {FolderName}", ConsoleColor.Cyan);
-Log($"[+] Max Concurrency: {maxConcurrency}", ConsoleColor.Cyan);
-Log("[+] Starting crawl...", ConsoleColor.Cyan);
+Log($"[+] created root folder: {FolderName}", ConsoleColor.Cyan);
+Log($"[+] max concurrency: {maxConcurrency}", ConsoleColor.Cyan);
+Log("[+] starting crawl...", ConsoleColor.Cyan);
 
 ProgramStopwatch.Start();
 
-// Queue the start URL
 string canonicalStartUrl = BaseUri.AbsoluteUri;
 QueuedUrls.TryAdd(canonicalStartUrl, 0);
 TotalPagesDiscovered = 1;
 
 StartPageDownload(canonicalStartUrl);
 
-// Wait for all tasks to complete
 await AllDoneTcs.Task;
 
 ProgramStopwatch.Stop();
 
-// Final UI update and cleanup
-TriggerUIUpdate("FINISHED", force: true);
+TriggerUIUpdate("finished", force: true);
 
 if (AnsiEnabled)
 {
-    // Reset scroll margins and move cursor to end
     Console.Write("\x1b[r");
     Console.SetCursorPosition(0, Console.WindowHeight - 1);
 }
 
 Log("\n==========================================", ConsoleColor.Green);
-Log(" DONE COPYING WEBSITE!", ConsoleColor.Green);
-Log($" Total pages ripped: {CompletedPages}", ConsoleColor.Green);
-Log($" Total assets grabbed: {CompletedAssets}", ConsoleColor.Green);
-Log($" Failed downloads: {FailedCount}", ConsoleColor.Red);
-Log($" Time taken: {ProgramStopwatch.Elapsed.TotalSeconds:F2} seconds", ConsoleColor.Cyan);
+Log(" done copying website!", ConsoleColor.Green);
+Log($" total pages ripped: {CompletedPages}", ConsoleColor.Green);
+Log($" total assets grabbed: {CompletedAssets}", ConsoleColor.Green);
+Log($" failed downloads: {FailedCount}", ConsoleColor.Red);
+Log($" time taken: {ProgramStopwatch.Elapsed.TotalSeconds:F2} seconds", ConsoleColor.Cyan);
 Log("==========================================", ConsoleColor.Green);
 
-// Methods and helper functions
 
 void StartPageDownload(string url)
 {
@@ -248,7 +236,7 @@ void StartPageDownload(string url)
         }
         catch (Exception ex)
         {
-            Log($" [X] ERROR on {url}: {ex.Message}", ConsoleColor.Red);
+            Log($" [x] error on {url}: {ex.Message.ToLower()}", ConsoleColor.Red);
             Interlocked.Increment(ref FailedCount);
         }
         finally
@@ -277,7 +265,7 @@ void StartAssetDownload(string url)
         }
         catch (Exception ex)
         {
-            Log($" [X] ERROR on asset {url}: {ex.Message}", ConsoleColor.Red);
+            Log($" [x] error on asset {url}: {ex.Message.ToLower()}", ConsoleColor.Red);
             Interlocked.Increment(ref FailedCount);
         }
         finally
@@ -293,15 +281,14 @@ async Task ProcessPageAsync(string url)
     string pageFileName = Registry.GetOrAddPage(currentUri);
     string htmlPath = Path.Combine(FolderName, pageFileName);
 
-    Log($"[~] Fetching page: {url}", ConsoleColor.Yellow);
-    TriggerUIUpdate("CRAWLING");
+    Log($"[~] fetching page: {url}", ConsoleColor.Yellow);
+    TriggerUIUpdate("crawling");
 
     string htmlContent = await Client.GetStringAsync(url);
     
     HtmlDocument document = new HtmlDocument();
     document.LoadHtml(htmlContent);
 
-    // Parse normal links
     var linkTags = document.DocumentNode.SelectNodes("//a[@href]");
     if (linkTags != null)
     {
@@ -317,7 +304,6 @@ async Task ProcessPageAsync(string url)
                 {
                     if (IsWebPage(linkUri))
                     {
-                        // Crawlable page
                         if (!SinglePageOnly)
                         {
                             string localName = Registry.GetOrAddPage(linkUri);
@@ -332,14 +318,11 @@ async Task ProcessPageAsync(string url)
                         }
                         else
                         {
-                            // Single page mode: Keep link pointing to original web URL
-                            // so navigation still works online
                             link.SetAttributeValue("href", linkUri.AbsoluteUri);
                         }
                     }
                     else
                     {
-                        // Asset link
                         string localName = Registry.GetOrAddAsset(linkUri);
                         link.SetAttributeValue("href", localName);
 
@@ -356,7 +339,6 @@ async Task ProcessPageAsync(string url)
         }
     }
 
-    // Parse embedded assets (supporting all media, font, stylesheet, script and embed formats)
     var assetNodes = document.DocumentNode.SelectNodes("//img[@src] | //frame[@src] | //iframe[@src] | //*[@background] | //link[@rel='stylesheet'][@href] | //input[@type='image'][@src] | //script[@src] | //audio[@src] | //video[@src] | //source[@src] | //embed[@src] | //object[@data]");
     if (assetNodes != null)
     {
@@ -377,7 +359,7 @@ async Task ProcessPageAsync(string url)
                 if (assetUri.Host != BaseUri.Host && assetUri.Scheme.StartsWith("http"))
                 {
                     node.Remove();
-                    Log($"  -> [DELETED] external tracker/ad removed: {assetUri.Host}", ConsoleColor.DarkYellow);
+                    Log($"  -> [deleted] external tracker/ad removed: {assetUri.Host}", ConsoleColor.DarkYellow);
                     continue;
                 }
 
@@ -395,7 +377,6 @@ async Task ProcessPageAsync(string url)
         }
     }
 
-    // Save modified HTML asynchronously
     using (var ms = new MemoryStream())
     {
         document.Save(ms);
@@ -404,8 +385,8 @@ async Task ProcessPageAsync(string url)
     }
 
     Interlocked.Increment(ref CompletedPages);
-    Log($"  -> [HTML SAVED] {pageFileName}", ConsoleColor.Green);
-    TriggerUIUpdate("CRAWLING");
+    Log($"  -> [html saved] {pageFileName}", ConsoleColor.Green);
+    TriggerUIUpdate("crawling");
 }
 
 async Task ProcessAssetAsync(string url)
@@ -414,8 +395,8 @@ async Task ProcessAssetAsync(string url)
     string cleanFileName = Registry.GetOrAddAsset(assetUri);
     string filePath = Path.Combine(FolderName, cleanFileName);
 
-    Log($"  -> [DOWNLOADING ASSET] {cleanFileName}...", ConsoleColor.Cyan);
-    TriggerUIUpdate("CRAWLING");
+    Log($"  -> [downloading asset] {cleanFileName}...", ConsoleColor.Cyan);
+    TriggerUIUpdate("crawling");
 
     using (var response = await Client.GetAsync(assetUri, HttpCompletionOption.ResponseHeadersRead))
     {
@@ -428,10 +409,9 @@ async Task ProcessAssetAsync(string url)
     }
 
     Interlocked.Increment(ref CompletedAssets);
-    Log($"  -> [ASSET SAVED] {cleanFileName}", ConsoleColor.DarkCyan);
-    TriggerUIUpdate("CRAWLING");
+    Log($"  -> [asset saved] {cleanFileName}", ConsoleColor.DarkCyan);
+    TriggerUIUpdate("crawling");
 
-    // If it's a CSS file, parse it for nested assets!
     if (Path.GetExtension(cleanFileName).Equals(".css", StringComparison.OrdinalIgnoreCase))
     {
         await ProcessCssFileAsync(filePath, assetUri);
@@ -461,7 +441,7 @@ void EnableAnsi()
             var handle = GetStdHandle(-11);
             if (GetConsoleMode(handle, out uint mode))
             {
-                mode |= 0x0004; // ENABLE_VIRTUAL_TERMINAL_PROCESSING
+                mode |= 0x0004; 
                 if (SetConsoleMode(handle, mode))
                 {
                     AnsiEnabled = true;
@@ -532,52 +512,43 @@ void UpdateProgress(
     {
         if (AnsiEnabled)
         {
-            // Save cursor position
             Console.Write("\x1b[s");
 
-            // Move cursor to top left corner
             Console.Write("\x1b[1;1H");
 
             int width = Console.WindowWidth;
             if (width < 40) width = 80;
 
-            // Line 1: Status & Timer
             string elapsedStr = $"{elapsed.Hours:D2}:{elapsed.Minutes:D2}:{elapsed.Seconds:D2}.{elapsed.Milliseconds / 100:D1}";
-            string titleLine = $" SITE CLONER  |  Status: {status}  |  Elapsed: {elapsedStr}  |  Speed: {speed:F1} req/s";
+            string titleLine = $" site cloner  |  status: {status}  |  elapsed: {elapsedStr}  |  speed: {speed:F1} req/s";
             Console.Write(titleLine.PadRight(width - 1).Substring(0, width - 1) + "\n");
 
-            // Line 2: Progress bar with percent in top corner
             int total = pagesTotal + assetsTotal;
             int completed = pagesCompleted + assetsCompleted;
             double pct = total > 0 ? (double)completed / total : 0;
             
-            // We want percent at the top corner. Let's make the progress bar fill the space, leaving room for percent on the right.
             string pctStr = $" {pct * 100:F1}%";
             int barWidth = Math.Max(10, width - 20 - pctStr.Length);
             int filledWidth = (int)Math.Round(pct * barWidth);
             string bar = new string('█', filledWidth) + new string('░', barWidth - filledWidth);
             
-            string progressLine = $" Progress: [{bar}]{pctStr}";
+            string progressLine = $" progress: [{bar}]{pctStr}";
             Console.Write(progressLine.PadRight(width - 1).Substring(0, width - 1) + "\n");
 
-            // Line 3: Detailed counters
-            string countersLine = $" Pages: {pagesCompleted}/{pagesTotal}  |  Assets: {assetsCompleted}/{assetsTotal}  |  Errors: {errors}";
+            string countersLine = $" pages: {pagesCompleted}/{pagesTotal}  |  assets: {assetsCompleted}/{assetsTotal}  |  errors: {errors}";
             Console.Write(countersLine.PadRight(width - 1).Substring(0, width - 1) + "\n");
 
-            // Line 4: Divider
             string divider = new string('─', width - 1);
             Console.Write(divider.Substring(0, width - 1) + "\n");
 
-            // Restore cursor position
             Console.Write("\x1b[u");
         }
         else
         {
-            // Simple inline update for non-ANSI terminals (throttled to avoid log flooding)
             int total = pagesTotal + assetsTotal;
             int completed = pagesCompleted + assetsCompleted;
             double pct = total > 0 ? (double)completed / total : 0;
-            Console.WriteLine($"[STATUS: {status}] Progress: {pct * 100:F1}% (Pages: {pagesCompleted}/{pagesTotal}, Assets: {assetsCompleted}/{assetsTotal}, Speed: {speed:F1} req/s)");
+            Console.WriteLine($"[status: {status}] progress: {pct * 100:F1}% (pages: {pagesCompleted}/{pagesTotal}, assets: {assetsCompleted}/{assetsTotal}, speed: {speed:F1} req/s)");
         }
     }
 }
@@ -606,12 +577,10 @@ async Task ProcessCssFileAsync(string localPath, Uri cssUri)
         string cssContent = await File.ReadAllTextAsync(localPath);
         bool modified = false;
 
-        // Find and process @import "style.css" statements (non-url syntax)
         cssContent = CssImportRegex.Replace(cssContent, m =>
         {
             string originalUrl = m.Groups[1].Value.Trim();
             
-            // If it starts with url(, skip as it will be handled by the url(...) replacement
             if (originalUrl.StartsWith("url", StringComparison.OrdinalIgnoreCase))
             {
                 return m.Value;
@@ -640,12 +609,10 @@ async Task ProcessCssFileAsync(string localPath, Uri cssUri)
             return m.Value;
         });
 
-        // Find and process url(...) statements
         cssContent = CssUrlRegex.Replace(cssContent, m =>
         {
             string originalUrl = m.Groups[1].Value.Trim();
             
-            // Trim quotes if any
             if ((originalUrl.StartsWith("'") && originalUrl.EndsWith("'")) || 
                 (originalUrl.StartsWith("\"") && originalUrl.EndsWith("\"")))
             {
@@ -685,16 +652,15 @@ async Task ProcessCssFileAsync(string localPath, Uri cssUri)
         if (modified)
         {
             await File.WriteAllTextAsync(localPath, cssContent);
-            Log($"  -> [CSS UPDATED] Rewrote nested assets in {Path.GetFileName(localPath)}", ConsoleColor.DarkGreen);
+            Log($"  -> [css updated] rewrote nested assets in {Path.GetFileName(localPath)}", ConsoleColor.DarkGreen);
         }
     }
     catch (Exception ex)
     {
-        Log($"  [!] Failed to parse CSS file {Path.GetFileName(localPath)}: {ex.Message}", ConsoleColor.DarkYellow);
+        Log($"  [!] failed to parse css file {Path.GetFileName(localPath)}: {ex.Message.ToLower()}", ConsoleColor.DarkYellow);
     }
 }
 
-// Windows native imports for console management
 [DllImport("kernel32.dll", SetLastError = true)]
 static extern IntPtr GetStdHandle(int nStdHandle);
 
@@ -703,8 +669,6 @@ static extern bool GetConsoleMode(IntPtr hConsoleHandle, out uint lpMode);
 
 [DllImport("kernel32.dll", SetLastError = true)]
 static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
-
-// Helper Classes at the bottom
 
 public class UrlRegistry
 {
@@ -744,7 +708,6 @@ public class UrlRegistry
             string ext = Path.GetExtension(cleanName);
             string baseName = Path.GetFileNameWithoutExtension(cleanName);
 
-            // Force html or htm page to be .html or keep existing if it's already html-like
             if (string.IsNullOrEmpty(ext) || (!ext.Equals(".html", StringComparison.OrdinalIgnoreCase) && !ext.Equals(".htm", StringComparison.OrdinalIgnoreCase)))
             {
                 ext = ".html";
@@ -778,7 +741,7 @@ public class UrlRegistry
 
             if (string.IsNullOrEmpty(ext))
             {
-                ext = ".dat"; // fallback extension
+                ext = ".dat"; 
             }
 
             string proposedName = $"{baseName}{ext}";
